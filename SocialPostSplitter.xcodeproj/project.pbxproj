@@ -10,9 +10,22 @@
 		0AD223592D7DA41000FA89CA /* SocialPostSplitter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SocialPostSplitter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		0AD223AC2D7DE2DA00FA89CA /* Exceptions for "SocialPostSplitter" folder in "SocialPostSplitter" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 0AD223582D7DA41000FA89CA /* SocialPostSplitter */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		0AD2235B2D7DA41000FA89CA /* SocialPostSplitter */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				0AD223AC2D7DE2DA00FA89CA /* Exceptions for "SocialPostSplitter" folder in "SocialPostSplitter" target */,
+			);
 			path = SocialPostSplitter;
 			sourceTree = "<group>";
 		};
@@ -255,6 +268,7 @@
 				DEVELOPMENT_TEAM = G7HRH2B3C7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SocialPostSplitter/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Post Split";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -287,6 +301,7 @@
 				DEVELOPMENT_TEAM = G7HRH2B3C7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SocialPostSplitter/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Post Split";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
