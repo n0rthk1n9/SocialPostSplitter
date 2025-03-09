@@ -28,30 +28,8 @@ struct ContentView: View {
                 } else {
                     SplittedPostsHeaderView(segmentCount: viewModel.outputSegments.count) {
                         isTransformed = false
+                        greyedSegments.removeAll()
                     }
-                }
-
-                if !isTransformed {
-                    Button {
-                        if selectedLimit == .custom, let customValue = Int(customLimit) {
-                            viewModel.maxChars = customValue
-                        } else {
-                            viewModel.maxChars = selectedLimit.defaultLimit ?? 300
-                        }
-                        viewModel.transform()
-                        isTransformed = true
-                        isInputFocused = false
-                    } label: {
-                        Text("Split")
-                            .frame(maxWidth: .infinity)
-                            .font(.title2)
-                            .bold()
-                            .padding(.horizontal)
-                            .padding(.vertical, 8)
-                    }
-                    .tint(.indigo)
-                    .buttonStyle(.borderedProminent)
-                    .padding()
                 }
 
                 if isTransformed {
@@ -60,6 +38,34 @@ struct ContentView: View {
                         greyedSegments: $greyedSegments
                     )
                 }
+
+                Button {
+                    if !isTransformed {
+                        if selectedLimit == .custom, let customValue = Int(customLimit) {
+                            viewModel.maxChars = customValue
+                        } else {
+                            viewModel.maxChars = selectedLimit.defaultLimit ?? 300
+                        }
+                        viewModel.transform()
+                        isTransformed = true
+                        isInputFocused = false
+                    } else {
+                        viewModel.inputText = ""
+                        viewModel.outputSegments = []
+                        greyedSegments.removeAll()
+                        isTransformed = false
+                    }
+                } label: {
+                    Text(isTransformed ? "Start over" : "Split")
+                        .frame(maxWidth: .infinity)
+                        .font(.title2)
+                        .bold()
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                }
+                .tint(isTransformed ? .red : .indigo)
+                .buttonStyle(.borderedProminent)
+                .padding()
             }
             .navigationTitle("Social Post Splitter")
             .toolbar {
