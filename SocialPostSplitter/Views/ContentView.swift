@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var viewModel = SegmentationViewModel()
+    @State private var viewModel = SocialPostSplitterViewModel()
     @State private var isTransformed = false
     @FocusState private var isInputFocused: Bool
     @State private var selectedLimit: CharacterLimit = .bluesky

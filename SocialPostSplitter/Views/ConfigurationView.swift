@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ConfigurationView: View {
-    @Binding var viewModel: SegmentationViewModel
+    @Binding var viewModel: SocialPostSplitterViewModel
     @Binding var selectedLimit: CharacterLimit
     @Binding var customLimit: String
     @FocusState.Binding var isInputFocused: Bool
@@ -43,7 +43,7 @@ struct ConfigurationView: View {
 
 #Preview {
     ConfigurationView(
-        viewModel: .constant(SegmentationViewModel()),
+        viewModel: .constant(SocialPostSplitterViewModel()),
         selectedLimit: .constant(.bluesky),
         customLimit: .constant("250"),
         isInputFocused: FocusState<Bool>().projectedValue

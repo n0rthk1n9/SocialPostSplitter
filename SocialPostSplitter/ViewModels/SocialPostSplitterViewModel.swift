@@ -1,5 +1,5 @@
 //
-//  SegmentationViewModel.swift
+//  SocialPostSplitterViewModel.swift
 //  SocialPostSplitter
 //
 //  Created by Jan Armbrust on 09.03.2025.
@@ -8,7 +8,7 @@
 import Foundation
 
 @Observable
-final class SegmentationViewModel {
+final class SocialPostSplitterViewModel {
     var inputText: String = """
 After I had my challenge statement, I encountered the exact same problem, I wanted to solve with my app. I got overwhelmed with the task of doing research for my project. It felt as if the scale of the project is far too big and I had too little time and I just didn’t know how to solve all the problems ahead until I had a finished app. So I set out to change my surrounding and work from somewhere outside of my room at a nice place. Spoiler alert: I failed. Right after I realized that, I wrote a little story about my experience out there, I wanted to share with you. Beware it’s long and not polished, it’s just raw thoughts that came to my mind right after the situation.
 
