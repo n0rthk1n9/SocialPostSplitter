@@ -35,8 +35,19 @@ struct ConfigurationView: View {
                     .focused($isInputFocused)
             }
             Section("Post") {
-                TextField("Enter your post", text: $viewModel.inputText, axis: .vertical)
-                    .focused($isInputFocused)
+                HStack(alignment: .top) {
+                    TextField("Enter your post", text: $viewModel.inputText, axis: .vertical)
+                        .focused($isInputFocused)
+                    
+                    Button {
+                        if let pasteText = UIPasteboard.general.string {
+                            viewModel.inputText = pasteText
+                        }
+                    } label: {
+                        Label("Paste", systemImage: "doc.on.clipboard")
+                            .labelStyle(.iconOnly)
+                    }
+                }
             }
             Section {
                 Button("Generate Test Post") {
