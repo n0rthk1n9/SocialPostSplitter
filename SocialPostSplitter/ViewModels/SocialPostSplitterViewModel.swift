@@ -10,25 +10,32 @@ import Foundation
 @Observable
 final class SocialPostSplitterViewModel {
     var inputText: String = ""
-
     var outputSegments: [String] = []
     var maxChars: Int = 300
     var hashtags: String = "#BuildInPublic #indiedev #swift #swiftui #iOS #dev #iosdev"
     var applyHashtagsToAllSegments: Bool = false
-
+    
+    var splitMode: SplitMode = .words
+    
     func transform() {
-        let words = inputText.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
+        let components: [String]
+        switch splitMode {
+        case .words:
+            components = inputText.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
+        case .sentences:
+            components = splitTextIntoSentences(inputText)
+        }
+        
         var segmentsUnpadded: [String] = []
         var totalSegments = 10
         while true {
-            segmentsUnpadded = buildSegments(words: words, totalSegments: totalSegments)
+            segmentsUnpadded = buildSegments(components: components, totalSegments: totalSegments)
             if segmentsUnpadded.count == totalSegments { break }
             totalSegments = segmentsUnpadded.count
         }
-
+        
         let finalSegments = segmentsUnpadded.enumerated().map { (index, segment) -> String in
             let segIndex = index + 1
-            // Omit the marker if there's only one segment.
             let marker = totalSegments > 1 ? " (\(segIndex)/\(totalSegments))" : ""
             if self.applyHashtagsToAllSegments || segIndex == 1 {
                 return segment + marker + "\n\n" + hashtags
@@ -38,28 +45,38 @@ final class SocialPostSplitterViewModel {
         }
         outputSegments = finalSegments
     }
-
-    private func buildSegments(words: [String], totalSegments: Int) -> [String] {
+    
+    private func buildSegments(components: [String], totalSegments: Int) -> [String] {
         var segments: [String] = []
         var currentSegment = ""
         var segIndex = 1
-
-        for word in words {
+        
+        for component in components {
             let marker = totalSegments > 1 ? " (\(segIndex)/\(totalSegments))" : ""
             let extra = (segIndex == 1 || self.applyHashtagsToAllSegments) ? "\n\n" + hashtags : ""
             let capacity = maxChars - marker.count - extra.count
-            let candidate = currentSegment.isEmpty ? word : currentSegment + " " + word
-
+            let candidate = currentSegment.isEmpty ? component : currentSegment + " " + component
+            
             if candidate.count <= capacity {
                 currentSegment = candidate
             } else {
                 segments.append(currentSegment)
                 segIndex += 1
-                currentSegment = word
+                currentSegment = component
             }
         }
         segments.append(currentSegment)
         return segments
+    }
+    
+    private func splitTextIntoSentences(_ text: String) -> [String] {
+        var sentences: [String] = []
+        text.enumerateSubstrings(in: text.startIndex..<text.endIndex, options: .bySentences) { substring, _, _, _ in
+            if let sentence = substring?.trimmingCharacters(in: .whitespacesAndNewlines), !sentence.isEmpty {
+                sentences.append(sentence)
+            }
+        }
+        return sentences
     }
 }
 

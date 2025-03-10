@@ -23,22 +23,40 @@ struct ConfigurationView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding(.vertical)
-                
                 if selectedLimit == .custom {
                     TextField("Enter custom limit", text: $customLimit)
                         .keyboardType(.numberPad)
                         .focused($isInputFocused)
                 }
             }
+            Section("Split Mode") {
+                Picker("Split Mode", selection: $viewModel.splitMode) {
+                    ForEach(SplitMode.allCases) { mode in
+                        Text(mode.displayText).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.vertical)
+            }
             Section("Hashtags") {
-                TextField("Hashtags", text: $viewModel.hashtags, axis: .vertical)
-                    .focused($isInputFocused)
+                HStack(alignment: .top) {
+                    TextField("Hashtags", text: $viewModel.hashtags, axis: .vertical)
+                        .focused($isInputFocused)
+                    Button {
+                        if let pasteText = UIPasteboard.general.string {
+                            viewModel.hashtags = pasteText
+                        }
+                    } label: {
+                        Label("Paste", systemImage: "doc.on.clipboard")
+                            .labelStyle(.iconOnly)
+                    }
+                }
+                Toggle("Apply to all segments", isOn: $viewModel.applyHashtagsToAllSegments)
             }
             Section("Post") {
                 HStack(alignment: .top) {
                     TextField("Enter your post", text: $viewModel.inputText, axis: .vertical)
                         .focused($isInputFocused)
-                    
                     Button {
                         if let pasteText = UIPasteboard.general.string {
                             viewModel.inputText = pasteText
