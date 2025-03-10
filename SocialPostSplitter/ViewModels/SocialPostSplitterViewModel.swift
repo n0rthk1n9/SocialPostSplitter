@@ -24,7 +24,7 @@ final class SocialPostSplitterViewModel {
     var outputSegments: [String] = []
     var maxChars: Int = 300
     var hashtags: String = "#BuildInPublic #indiedev #swift #swiftui #iOS #dev #iosdev"
-    // New toggle property: if true, hashtags are appended to every segment.
+    // Toggle property: if true, hashtags are appended to every segment.
     var applyHashtagsToAllSegments: Bool = false
     
     func transform() {
@@ -36,10 +36,12 @@ final class SocialPostSplitterViewModel {
             if segmentsUnpadded.count == totalSegments { break }
             totalSegments = segmentsUnpadded.count
         }
+        
         let finalSegments = segmentsUnpadded.enumerated().map { (index, segment) -> String in
             let segIndex = index + 1
-            let marker = " (\(segIndex)/\(totalSegments))"
-            // Apply hashtags either on every segment or only on the first one.
+            // If there is only one segment, omit the marker.
+            let marker = totalSegments > 1 ? " (\(segIndex)/\(totalSegments))" : ""
+            // Append hashtags based on toggle: if enabled or for the first segment.
             if self.applyHashtagsToAllSegments || segIndex == 1 {
                 return segment + marker + "\n\n" + hashtags
             } else {
@@ -53,12 +55,15 @@ final class SocialPostSplitterViewModel {
         var segments: [String] = []
         var currentSegment = ""
         var segIndex = 1
+        
         for word in words {
-            let marker = " (\(segIndex)/\(totalSegments))"
-            // Reserve space for hashtags on every segment if the toggle is on, or just for the first segment otherwise.
+            // If there is only one segment, omit the marker length.
+            let marker = totalSegments > 1 ? " (\(segIndex)/\(totalSegments))" : ""
+            // Reserve space for hashtags if needed.
             let extra = (segIndex == 1 || self.applyHashtagsToAllSegments) ? "\n\n" + hashtags : ""
             let capacity = maxChars - marker.count - extra.count
             let candidate = currentSegment.isEmpty ? word : currentSegment + " " + word
+            
             if candidate.count <= capacity {
                 currentSegment = candidate
             } else {
