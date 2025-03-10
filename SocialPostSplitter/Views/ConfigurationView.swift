@@ -23,6 +23,7 @@ struct ConfigurationView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding(.vertical)
+                
                 if selectedLimit == .custom {
                     TextField("Enter custom limit", text: $customLimit)
                         .keyboardType(.numberPad)
@@ -32,11 +33,17 @@ struct ConfigurationView: View {
             Section("Hashtags") {
                 TextField("Hashtags", text: $viewModel.hashtags, axis: .vertical)
                     .focused($isInputFocused)
-                Toggle("Apply hashtags to every segment", isOn: $viewModel.applyHashtagsToAllSegments)
             }
             Section("Post") {
                 TextField("Enter your post", text: $viewModel.inputText, axis: .vertical)
                     .focused($isInputFocused)
+            }
+            Section {
+                Button("Generate Test Post") {
+                    viewModel.inputText = SocialPostSplitterViewModel.defaultTestPost
+                }
+                .frame(maxWidth: .infinity)
+                .foregroundStyle(.blue)
             }
         }
     }
