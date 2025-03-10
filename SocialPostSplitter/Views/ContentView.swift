@@ -67,7 +67,7 @@ struct ContentView: View {
                 .buttonStyle(.borderedProminent)
                 .padding()
             }
-            .navigationTitle("Social Post Splitter")
+            .navigationTitle("Post Split")
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
