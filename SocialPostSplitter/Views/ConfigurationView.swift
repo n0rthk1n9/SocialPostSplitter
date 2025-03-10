@@ -32,6 +32,7 @@ struct ConfigurationView: View {
             Section("Hashtags") {
                 TextField("Hashtags", text: $viewModel.hashtags, axis: .vertical)
                     .focused($isInputFocused)
+                Toggle("Apply hashtags to every segment", isOn: $viewModel.applyHashtagsToAllSegments)
             }
             Section("Post") {
                 TextField("Enter your post", text: $viewModel.inputText, axis: .vertical)

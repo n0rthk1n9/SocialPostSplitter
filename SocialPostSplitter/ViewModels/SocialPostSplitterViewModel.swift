@@ -24,6 +24,8 @@ final class SocialPostSplitterViewModel {
     var outputSegments: [String] = []
     var maxChars: Int = 300
     var hashtags: String = "#BuildInPublic #indiedev #swift #swiftui #iOS #dev #iosdev"
+    // New toggle property: if true, hashtags are appended to every segment.
+    var applyHashtagsToAllSegments: Bool = false
     
     func transform() {
         let words = inputText.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
@@ -37,7 +39,8 @@ final class SocialPostSplitterViewModel {
         let finalSegments = segmentsUnpadded.enumerated().map { (index, segment) -> String in
             let segIndex = index + 1
             let marker = " (\(segIndex)/\(totalSegments))"
-            if segIndex == 1 {
+            // Apply hashtags either on every segment or only on the first one.
+            if self.applyHashtagsToAllSegments || segIndex == 1 {
                 return segment + marker + "\n\n" + hashtags
             } else {
                 return segment + marker
@@ -52,7 +55,8 @@ final class SocialPostSplitterViewModel {
         var segIndex = 1
         for word in words {
             let marker = " (\(segIndex)/\(totalSegments))"
-            let extra = segIndex == 1 ? "\n\n" + hashtags : ""
+            // Reserve space for hashtags on every segment if the toggle is on, or just for the first segment otherwise.
+            let extra = (segIndex == 1 || self.applyHashtagsToAllSegments) ? "\n\n" + hashtags : ""
             let capacity = maxChars - marker.count - extra.count
             let candidate = currentSegment.isEmpty ? word : currentSegment + " " + word
             if candidate.count <= capacity {
