@@ -13,7 +13,7 @@ struct SplittedPostsHeaderView: View {
     
     var body: some View {
         HStack {
-            Text("Splitted posts (\(segmentCount))")
+            Text("Split posts (\(segmentCount))")
                 .font(.title2)
                 .bold()
             Spacer()
