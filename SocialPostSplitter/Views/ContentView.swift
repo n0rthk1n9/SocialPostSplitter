@@ -41,11 +41,6 @@ struct ContentView: View {
 
                 Button {
                     if !isTransformed {
-                        if selectedLimit == .custom, let customValue = Int(customLimit) {
-                            viewModel.maxChars = customValue
-                        } else {
-                            viewModel.maxChars = selectedLimit.defaultLimit ?? 300
-                        }
                         viewModel.transform()
                         isTransformed = true
                         isInputFocused = false

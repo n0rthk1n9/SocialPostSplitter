@@ -23,10 +23,20 @@ struct ConfigurationView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding(.vertical)
+                .onChange(of: selectedLimit) { _, newValue in
+                    if newValue != .custom {
+                        viewModel.maxChars = newValue.defaultLimit ?? 300
+                    }
+                }
                 if selectedLimit == .custom {
                     TextField("Enter custom limit", text: $customLimit)
                         .keyboardType(.numberPad)
                         .focused($isInputFocused)
+                        .onChange(of: customLimit) { _, newValue in
+                            if let customValue = Int(newValue) {
+                                viewModel.maxChars = customValue
+                            }
+                        }
                 }
             }
             Section("Split Mode") {
@@ -53,10 +63,11 @@ struct ConfigurationView: View {
                 }
                 Toggle("Apply to all segments", isOn: $viewModel.applyHashtagsToAllSegments)
             }
-            Section("Post") {
+            Section {
                 HStack(alignment: .top) {
                     TextField("Enter your post", text: $viewModel.inputText, axis: .vertical)
                         .focused($isInputFocused)
+
                     Button {
                         if let pasteText = UIPasteboard.general.string {
                             viewModel.inputText = pasteText
@@ -66,7 +77,13 @@ struct ConfigurationView: View {
                             .labelStyle(.iconOnly)
                     }
                 }
+            } header: {
+                Text("Post (Will be split into \(viewModel.liveSegmentCount))")
+                    .font(.caption)
+                    .padding(4)
+                    .foregroundColor(.secondary)
             }
+
             Section {
                 Button("Generate Test Post") {
                     viewModel.inputText = SocialPostSplitterViewModel.defaultTestPost
