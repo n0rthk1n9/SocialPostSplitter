@@ -14,49 +14,105 @@ final class SocialPostSplitterViewModel {
     var maxChars: Int = 300
     var hashtags: String = "#BuildInPublic #indiedev #swift #swiftui #iOS #dev #iosdev"
     var applyHashtagsToAllSegments: Bool = false
-
     var splitMode: SplitMode = .words
 
-    func transform() {
-        let components: [String]
-        switch splitMode {
-        case .words:
-            components = inputText.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
-        case .sentences:
-            components = splitTextIntoSentences(inputText)
+    // In sentence mode, the entire first sentence is required;
+    // in word mode, require at least 15 characters.
+    var minContentRequired: Int {
+        if splitMode == .sentences, let firstSentence = splitTextIntoSentences(inputText).first {
+            return firstSentence.count
         }
-
-        var segmentsUnpadded: [String] = []
-        var totalSegments = 10
-        while true {
-            segmentsUnpadded = buildSegments(components: components, totalSegments: totalSegments)
-            if segmentsUnpadded.count == totalSegments { break }
-            totalSegments = segmentsUnpadded.count
-        }
-
-        let finalSegments = segmentsUnpadded.enumerated().map { (index, segment) -> String in
-            let segIndex = index + 1
-            let marker = totalSegments > 1 ? " (\(segIndex)/\(totalSegments))" : ""
-            if self.applyHashtagsToAllSegments || segIndex == 1 {
-                return segment + marker + "\n\n" + hashtags
-            } else {
-                return segment + marker
-            }
-        }
-        outputSegments = finalSegments
+        return 15
     }
 
-    private func buildSegments(components: [String], totalSegments: Int) -> [String] {
+    // The first segment must reserve enough space for content plus 2 newlines plus the full hashtags.
+    // (When applying hashtags to all segments, every segment must reserve that much.)
+    var hashtagsTooLong: Bool {
+        // For the first segment, reserved space = 2 newlines + hashtags.
+        maxChars < (minContentRequired + 2 + hashtags.count)
+    }
+
+    // In addition to the first segment check, in sentence mode we ensure that every sentence fits
+    // (using a rough estimate for the marker length, here assumed as 7 characters).
+    var sentencesFit: Bool {
+        guard splitMode == .sentences else { return true }
+        let markerEstimate = 7
+        let sentences = splitTextIntoSentences(inputText)
+        if let first = sentences.first, first.count + (2 + hashtags.count) + markerEstimate > maxChars {
+            return false
+        }
+        let reservedOther = applyHashtagsToAllSegments ? (2 + hashtags.count) : 0
+        for sentence in sentences.dropFirst() {
+            if sentence.count + reservedOther + markerEstimate > maxChars {
+                return false
+            }
+        }
+        return true
+    }
+
+    var canSplit: Bool {
+        return !hashtagsTooLong && sentencesFit
+    }
+
+    func transform() {
+        guard canSplit else {
+            outputSegments = []
+            return
+        }
+        let components = splitComponents(from: inputText, mode: splitMode)
+        let segments = computeStableSegments(for: components)
+        let formatted = segments.enumerated().map { (index, segment) -> String in
+            let marker = segments.count > 1 ? " (\(index + 1)/\(segments.count))" : ""
+            if applyHashtagsToAllSegments {
+                return segment + marker + "\n\n" + hashtags
+            } else {
+                return index == 0 ? segment + marker + "\n\n" + hashtags : segment + marker
+            }
+        }
+        // Final safety check: if any formatted segment exceeds maxChars, splitting is considered to fail.
+        if formatted.contains(where: { $0.count > maxChars }) {
+            outputSegments = []
+        } else {
+            outputSegments = formatted
+        }
+    }
+
+    func splitComponents(from text: String, mode: SplitMode) -> [String] {
+        switch mode {
+        case .words:
+            return text.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
+        case .sentences:
+            return splitTextIntoSentences(text)
+        }
+    }
+
+    func computeStableSegments(for components: [String]) -> [String] {
+        var totalSegments = 10
+        var segments: [String] = []
+        while true {
+            segments = buildSegments(for: components, totalSegments: totalSegments)
+            if segments.count == totalSegments { break }
+            totalSegments = segments.count
+        }
+        return segments
+    }
+
+    func buildSegments(for components: [String], totalSegments: Int) -> [String] {
         var segments: [String] = []
         var currentSegment = ""
         var segIndex = 1
 
         for component in components {
             let marker = totalSegments > 1 ? " (\(segIndex)/\(totalSegments))" : ""
-            let extra = (segIndex == 1 || self.applyHashtagsToAllSegments) ? "\n\n" + hashtags : ""
-            let capacity = maxChars - marker.count - extra.count
+            let reserved: Int = {
+                if applyHashtagsToAllSegments {
+                    return 2 + hashtags.count
+                } else {
+                    return segIndex == 1 ? (2 + hashtags.count) : 0
+                }
+            }()
+            let capacity = maxChars - marker.count - reserved
             let candidate = currentSegment.isEmpty ? component : currentSegment + " " + component
-
             if candidate.count <= capacity {
                 currentSegment = candidate
             } else {
@@ -69,7 +125,7 @@ final class SocialPostSplitterViewModel {
         return segments
     }
 
-    private func splitTextIntoSentences(_ text: String) -> [String] {
+    func splitTextIntoSentences(_ text: String) -> [String] {
         var sentences: [String] = []
         text.enumerateSubstrings(in: text.startIndex..<text.endIndex, options: .bySentences) { substring, _, _, _ in
             if let sentence = substring?.trimmingCharacters(in: .whitespacesAndNewlines), !sentence.isEmpty {
@@ -80,21 +136,8 @@ final class SocialPostSplitterViewModel {
     }
 
     var liveSegmentCount: Int {
-        let components: [String]
-        switch splitMode {
-        case .words:
-            components = inputText.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
-        case .sentences:
-            components = splitTextIntoSentences(inputText)
-        }
-        var segmentsUnpadded: [String] = []
-        var totalSegments = 10
-        while true {
-            segmentsUnpadded = buildSegments(components: components, totalSegments: totalSegments)
-            if segmentsUnpadded.count == totalSegments { break }
-            totalSegments = segmentsUnpadded.count
-        }
-        return segmentsUnpadded.count
+        let components = splitComponents(from: inputText, mode: splitMode)
+        return computeStableSegments(for: components).count
     }
 }
 

@@ -39,6 +39,12 @@ struct ContentView: View {
                     )
                 }
 
+                if !viewModel.canSplit {
+                    Text("Too many hashtags to fit into a single segment. Please shorten your hashtags.")
+                        .foregroundColor(.red)
+                        .font(.caption)
+                }
+
                 Button {
                     if !isTransformed {
                         viewModel.transform()
@@ -58,6 +64,7 @@ struct ContentView: View {
                         .padding(.horizontal)
                         .padding(.vertical, 8)
                 }
+                .disabled(!viewModel.canSplit)
                 .tint(isTransformed ? .red : .indigo)
                 .buttonStyle(.borderedProminent)
                 .padding()

@@ -23,8 +23,8 @@ struct ConfigurationView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding(.vertical)
-                .onChange(of: selectedLimit) { _, newValue in
-                    if newValue != .custom {
+                .onChange(of: selectedLimit) { oldValue, newValue in
+                    if newValue != oldValue && newValue != .custom {
                         viewModel.maxChars = newValue.defaultLimit ?? 300
                     }
                 }
@@ -32,8 +32,8 @@ struct ConfigurationView: View {
                     TextField("Enter custom limit", text: $customLimit)
                         .keyboardType(.numberPad)
                         .focused($isInputFocused)
-                        .onChange(of: customLimit) { _, newValue in
-                            if let customValue = Int(newValue) {
+                        .onChange(of: customLimit) { oldValue, newValue in
+                            if newValue != oldValue, let customValue = Int(newValue) {
                                 viewModel.maxChars = customValue
                             }
                         }
@@ -62,12 +62,17 @@ struct ConfigurationView: View {
                     }
                 }
                 Toggle("Apply to all segments", isOn: $viewModel.applyHashtagsToAllSegments)
+                    .disabled(viewModel.hashtagsTooLong)
+                if viewModel.hashtagsTooLong {
+                    Text("Hashtags are too long to fit into one segment. Please shorten them.")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                }
             }
             Section {
                 HStack(alignment: .top) {
                     TextField("Enter your post", text: $viewModel.inputText, axis: .vertical)
                         .focused($isInputFocused)
-
                     Button {
                         if let pasteText = UIPasteboard.general.string {
                             viewModel.inputText = pasteText
@@ -83,7 +88,6 @@ struct ConfigurationView: View {
                     .padding(4)
                     .foregroundColor(.secondary)
             }
-
             Section {
                 Button("Generate Test Post") {
                     viewModel.inputText = SocialPostSplitterViewModel.defaultTestPost
