@@ -14,6 +14,7 @@ struct ContentView: View {
     @State private var selectedLimit: CharacterLimit = .bluesky
     @State private var customLimit: String = "300"
     @State private var greyedSegments: Set<Int> = []
+    @State private var showConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -26,10 +27,9 @@ struct ContentView: View {
                         isInputFocused: $isInputFocused
                     )
                 } else {
-                    SplittedPostsHeaderView(segmentCount: viewModel.outputSegments.count) {
-                        isTransformed = false
-                        greyedSegments.removeAll()
-                    }
+                    Text("Split posts (\(viewModel.outputSegments.count))")
+                        .font(.title2)
+                        .bold()
                 }
 
                 if isTransformed {
@@ -45,28 +45,62 @@ struct ContentView: View {
                         .font(.caption)
                 }
 
-                Button {
-                    if !isTransformed {
-                        viewModel.transform()
-                        isTransformed = true
-                        isInputFocused = false
+                HStack(spacing: 16) {
+                    if isTransformed {
+                        Button(role: .destructive) {
+                            showConfirmation = true
+                        } label: {
+                            Text("Start over")
+                                .frame(maxWidth: .infinity)
+                                .font(.title2)
+                                .bold()
+                                .padding(.horizontal)
+                                .padding(.vertical, 8)
+                        }
+                        .buttonStyle(.bordered)
+                        .confirmationDialog(
+                            "Are you sure you want to delete your post?",
+                            isPresented: $showConfirmation,
+                            titleVisibility: .visible
+                        ) {
+                            Button("Start over", role: .destructive) {
+                                viewModel.inputText = ""
+                                viewModel.outputSegments = []
+                                greyedSegments.removeAll()
+                                isTransformed = false
+                            }
+                            Button("Cancel", role: .cancel) {}
+                        }
+
+                        Button {
+                            isTransformed = false
+                        } label: {
+                            Text("Edit")
+                                .frame(maxWidth: .infinity)
+                                .font(.title2)
+                                .bold()
+                                .padding(.horizontal)
+                                .padding(.vertical, 8)
+                        }
+                        .buttonStyle(.borderedProminent)
                     } else {
-                        viewModel.inputText = ""
-                        viewModel.outputSegments = []
-                        greyedSegments.removeAll()
-                        isTransformed = false
+                        Button {
+                            viewModel.transform()
+                            isTransformed = true
+                            isInputFocused = false
+                        } label: {
+                            Text("Split")
+                                .frame(maxWidth: .infinity)
+                                .font(.title2)
+                                .bold()
+                                .padding(.horizontal)
+                                .padding(.vertical, 8)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.indigo)
+                        .disabled(!viewModel.canSplit)
                     }
-                } label: {
-                    Text(isTransformed ? "Start over" : "Split")
-                        .frame(maxWidth: .infinity)
-                        .font(.title2)
-                        .bold()
-                        .padding(.horizontal)
-                        .padding(.vertical, 8)
                 }
-                .disabled(!viewModel.canSplit)
-                .tint(isTransformed ? .red : .indigo)
-                .buttonStyle(.borderedProminent)
                 .padding()
             }
             .navigationTitle("Post Split")
