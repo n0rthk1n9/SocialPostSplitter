@@ -74,6 +74,7 @@ struct ContentView: View {
 
                         Button {
                             isTransformed = false
+                            greyedSegments.removeAll()
                         } label: {
                             Text("Edit")
                                 .frame(maxWidth: .infinity)
