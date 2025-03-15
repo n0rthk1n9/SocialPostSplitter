@@ -33,7 +33,7 @@ struct ContentView: View {
                 }
 
                 if isTransformed {
-                    SplittedPostsView(
+                    SplitPostsView(
                         posts: viewModel.outputSegments,
                         greyedSegments: $greyedSegments
                     )

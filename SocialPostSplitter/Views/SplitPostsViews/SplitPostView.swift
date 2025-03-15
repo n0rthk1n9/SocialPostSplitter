@@ -1,5 +1,5 @@
 //
-//  SplittedPostView.swift
+//  SplitPostView.swift
 //  SocialPostSplitter
 //
 //  Created by Jan Armbrust on 09.03.2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SplittedPostView: View {
+struct SplitPostView: View {
     let post: String
     let index: Int
     @Binding var greyedSegments: Set<Int>
@@ -68,5 +68,5 @@ struct SplittedPostView: View {
 }
 
 #Preview {
-    SplittedPostView(post: "This is a nice post", index: 0, greyedSegments: .constant(Set([1])))
+    SplitPostView(post: "This is a nice post", index: 0, greyedSegments: .constant(Set([1])))
 }

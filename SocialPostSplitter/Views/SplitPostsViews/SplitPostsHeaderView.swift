@@ -1,5 +1,5 @@
 //
-//  SplittedPostsHeaderView.swift
+//  SplitPostsHeaderView.swift
 //  SocialPostSplitter
 //
 //  Created by Jan Armbrust on 09.03.2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SplittedPostsHeaderView: View {
+struct SplitPostsHeaderView: View {
     let segmentCount: Int
     let onEdit: () -> Void
     
@@ -25,5 +25,5 @@ struct SplittedPostsHeaderView: View {
 }
 
 #Preview {
-    SplittedPostsHeaderView(segmentCount: 13, onEdit: {})
+    SplitPostsHeaderView(segmentCount: 13, onEdit: {})
 }
