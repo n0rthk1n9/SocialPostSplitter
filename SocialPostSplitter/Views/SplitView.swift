@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct SplitView: View {
     @Environment(SocialPostSplitterViewModel.self) private var viewModel
     
     @State private var isTransformed = false
@@ -66,6 +66,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    SplitView()
         .environment(SocialPostSplitterViewModel())
 }

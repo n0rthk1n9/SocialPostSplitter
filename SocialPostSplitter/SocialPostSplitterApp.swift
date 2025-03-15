@@ -13,7 +13,7 @@ struct SocialPostSplitterApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainView()
                 .environment(viewModel)
         }
     }
