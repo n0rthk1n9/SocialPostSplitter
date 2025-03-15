@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ConfigurationView: View {
     @Environment(SocialPostSplitterViewModel.self) private var viewModel
+    @Query(sort: \HashtagSet.label, order: .forward) var availableHashtagSets: [HashtagSet]
     
     @Binding var selectedLimit: CharacterLimit
     @Binding var customLimit: String
@@ -41,6 +43,33 @@ struct ConfigurationView: View {
                         }
                 }
             }
+            Section("Hashtag Set") {
+                Picker("Hashtag Set", selection: $viewModel.selectedHashtagSet) {
+                    Text("None").tag(HashtagSet?.none)
+                    ForEach(availableHashtagSets, id: \ .id) { set in
+                        Text(set.label).tag(Optional(set))
+                    }
+                }
+                .pickerStyle(.menu)
+            }
+            Section("Hashtags") {
+                Toggle("Apply to all segments", isOn: $viewModel.applyHashtagsToAllSegments)
+                    .disabled(viewModel.hashtagsTooLong)
+                if viewModel.hashtagsTooLong {
+                    Text("Hashtags are too long to fit into one segment. Please shorten them.")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                }
+                Toggle("Use Accessible Hashtags", isOn: $viewModel.useAccessibleHashtags)
+                if viewModel.selectedHashtagSet != nil {
+                    Text(viewModel.computedHashtags)
+                        .font(.body)
+                } else {
+                    Text("No Hashtag Set Selected")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                }
+            }
             Section("Split Mode") {
                 Picker("Split Mode", selection: $viewModel.splitMode) {
                     ForEach(SplitMode.allCases) { mode in
@@ -49,27 +78,6 @@ struct ConfigurationView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding(.vertical)
-            }
-            Section("Hashtags") {
-                HStack(alignment: .top) {
-                    TextField("Hashtags", text: $viewModel.hashtags, axis: .vertical)
-                        .focused($isInputFocused)
-                    Button {
-                        if let pasteText = UIPasteboard.general.string {
-                            viewModel.hashtags = pasteText
-                        }
-                    } label: {
-                        Label("Paste", systemImage: "doc.on.clipboard")
-                            .labelStyle(.iconOnly)
-                    }
-                }
-                Toggle("Apply to all segments", isOn: $viewModel.applyHashtagsToAllSegments)
-                    .disabled(viewModel.hashtagsTooLong)
-                if viewModel.hashtagsTooLong {
-                    Text("Hashtags are too long to fit into one segment. Please shorten them.")
-                        .font(.caption)
-                        .foregroundColor(.red)
-                }
             }
             Section {
                 HStack(alignment: .top) {
