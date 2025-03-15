@@ -22,16 +22,29 @@ struct SplittedPostView: View {
                     .background(.ultraThinMaterial)
                     .cornerRadius(8)
                     .overlay(
-                        Button {
-                            let generator = UINotificationFeedbackGenerator()
-                            generator.notificationOccurred(.success)
-                            UIPasteboard.general.string = post
-                            greyedSegments.insert(index)
-                        } label: {
-                            Label("Copy", systemImage: "doc.on.doc")
-                        }
-                        .buttonStyle(.bordered)
-                        .padding(8),
+                        HStack {
+                            if index == 0 {
+                                ShareLink(item: post) {
+                                    Label("Share post", systemImage: "square.and.arrow.up")
+                                        .labelStyle(.iconOnly)
+                                }
+                                .simultaneousGesture(
+                                    TapGesture().onEnded({ _ in
+                                        greyedSegments.insert(index)
+                                    })
+                                )
+                            }
+                            Button {
+                                let generator = UINotificationFeedbackGenerator()
+                                generator.notificationOccurred(.success)
+                                UIPasteboard.general.string = post
+                                greyedSegments.insert(index)
+                            } label: {
+                                Label("Copy", systemImage: "doc.on.doc")
+                            }
+                            .buttonStyle(.bordered)
+                            .padding(8)
+                        },
                         alignment: .bottomTrailing
                     )
             }
@@ -55,5 +68,5 @@ struct SplittedPostView: View {
 }
 
 #Preview {
-    SplittedPostView(post: "This is a nice post", index: 2, greyedSegments: .constant(Set([1])))
+    SplittedPostView(post: "This is a nice post", index: 0, greyedSegments: .constant(Set([1])))
 }
