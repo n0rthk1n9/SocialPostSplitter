@@ -8,17 +8,15 @@
 import SwiftUI
 
 struct SplitPostsView: View {
-    let posts: [String]
-    @Binding var greyedSegments: Set<Int>
+    @Environment(SocialPostSplitterViewModel.self) private var viewModel
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                ForEach(Array(posts.enumerated()), id: \.offset) { index, post in
+                ForEach(Array(viewModel.outputSegments.enumerated()), id: \.offset) { index, post in
                     SplitPostView(
                         post: post,
-                        index: index,
-                        greyedSegments: $greyedSegments
+                        index: index
                     )
                 }
             }
@@ -27,8 +25,6 @@ struct SplitPostsView: View {
 }
 
 #Preview {
-    SplitPostsView(
-        posts: ["This is a nice post", "This is an even nicer post"],
-        greyedSegments: .constant(Set([1]))
-    )
+    SplitPostsView()
+        .environment(SocialPostSplitterViewModel())
 }

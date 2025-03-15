@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct SplitPostView: View {
+    @Environment(SocialPostSplitterViewModel.self) private var viewModel
+    
     let post: String
     let index: Int
-    @Binding var greyedSegments: Set<Int>
     
     var body: some View {
         ZStack {
@@ -30,7 +31,7 @@ struct SplitPostView: View {
                                 }
                                 .simultaneousGesture(
                                     TapGesture().onEnded({ _ in
-                                        greyedSegments.insert(index)
+                                        viewModel.greyedSegments.insert(index)
                                     })
                                 )
                             }
@@ -38,7 +39,7 @@ struct SplitPostView: View {
                                 let generator = UINotificationFeedbackGenerator()
                                 generator.notificationOccurred(.success)
                                 UIPasteboard.general.string = post
-                                greyedSegments.insert(index)
+                                viewModel.greyedSegments.insert(index)
                             } label: {
                                 Label("Copy", systemImage: "doc.on.doc")
                             }
@@ -48,7 +49,7 @@ struct SplitPostView: View {
                         alignment: .bottomTrailing
                     )
             }
-            if greyedSegments.contains(index) {
+            if viewModel.greyedSegments.contains(index) {
                 Color.black.opacity(0.4)
                     .cornerRadius(8)
                 Text("✅")
@@ -57,10 +58,10 @@ struct SplitPostView: View {
             }
         }
         .onLongPressGesture {
-            if greyedSegments.contains(index) {
+            if viewModel.greyedSegments.contains(index) {
                 let generator = UINotificationFeedbackGenerator()
                 generator.notificationOccurred(.error)
-                greyedSegments.remove(index)
+                viewModel.greyedSegments.remove(index)
             }
         }
         .padding(.horizontal)
@@ -68,5 +69,5 @@ struct SplitPostView: View {
 }
 
 #Preview {
-    SplitPostView(post: "This is a nice post", index: 0, greyedSegments: .constant(Set([1])))
+    SplitPostView(post: "This is a nice post", index: 0)
 }

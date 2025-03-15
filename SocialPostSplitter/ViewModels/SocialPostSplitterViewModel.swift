@@ -15,6 +15,7 @@ final class SocialPostSplitterViewModel {
     var hashtags: String = "#BuildInPublic #indiedev #swift #swiftui #iOS #dev #iosdev"
     var applyHashtagsToAllSegments: Bool = false
     var splitMode: SplitMode = .words
+    var greyedSegments: Set<Int> = []
 
     // In sentence mode, the entire first sentence is required;
     // in word mode, require at least 15 characters.

@@ -8,12 +8,14 @@
 import SwiftUI
 
 struct ConfigurationView: View {
-    @Binding var viewModel: SocialPostSplitterViewModel
+    @Environment(SocialPostSplitterViewModel.self) private var viewModel
+    
     @Binding var selectedLimit: CharacterLimit
     @Binding var customLimit: String
     @FocusState.Binding var isInputFocused: Bool
 
     var body: some View {
+        @Bindable var viewModel = viewModel
         Form {
             Section("Character Limit") {
                 Picker("Character Limit", selection: $selectedLimit) {
@@ -101,9 +103,9 @@ struct ConfigurationView: View {
 
 #Preview {
     ConfigurationView(
-        viewModel: .constant(SocialPostSplitterViewModel()),
         selectedLimit: .constant(.bluesky),
         customLimit: .constant("250"),
         isInputFocused: FocusState<Bool>().projectedValue
     )
+    .environment(SocialPostSplitterViewModel())
 }

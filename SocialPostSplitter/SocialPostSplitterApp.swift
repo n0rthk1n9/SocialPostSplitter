@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct SocialPostSplitterApp: App {
+    @State private var viewModel = SocialPostSplitterViewModel()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(viewModel)
         }
     }
 }
